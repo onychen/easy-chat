@@ -23,7 +23,6 @@ func NewSocialServer(svcCtx *svc.ServiceContext) *SocialServer {
 	}
 }
 
-// 好友业务：请求好友、通过或拒绝申请、好友列表
 func (s *SocialServer) FriendPutIn(ctx context.Context, in *social.FriendPutInReq) (*social.FriendPutInResp, error) {
 	l := logic.NewFriendPutInLogic(ctx, s.svcCtx)
 	return l.FriendPutIn(in)
@@ -44,7 +43,6 @@ func (s *SocialServer) FriendList(ctx context.Context, in *social.FriendListReq)
 	return l.FriendList(in)
 }
 
-// 群业务：创建群，修改群，群公告，申请群，用户群列表，群成员，申请群，群退出..
 func (s *SocialServer) GroupCreate(ctx context.Context, in *social.GroupCreateReq) (*social.GroupCreateResp, error) {
 	l := logic.NewGroupCreateLogic(ctx, s.svcCtx)
 	return l.GroupCreate(in)

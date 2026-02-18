@@ -37,13 +37,10 @@ const (
 //
 // svc
 type SocialClient interface {
-	// 好友业务：请求好友、通过或拒绝申请、好友列表
 	FriendPutIn(ctx context.Context, in *FriendPutInReq, opts ...grpc.CallOption) (*FriendPutInResp, error)
 	FriendPutInHandle(ctx context.Context, in *FriendPutInHandleReq, opts ...grpc.CallOption) (*FriendPutInHandleResp, error)
 	FriendPutInList(ctx context.Context, in *FriendPutInListReq, opts ...grpc.CallOption) (*FriendPutInListResp, error)
 	FriendList(ctx context.Context, in *FriendListReq, opts ...grpc.CallOption) (*FriendListResp, error)
-	// 群业务：创建群，修改群，群公告，申请群，用户群列表，群成员，申请群，群退出..
-	// 群要求
 	GroupCreate(ctx context.Context, in *GroupCreateReq, opts ...grpc.CallOption) (*GroupCreateResp, error)
 	GroupPutin(ctx context.Context, in *GroupPutinReq, opts ...grpc.CallOption) (*GroupPutinResp, error)
 	GroupPutinList(ctx context.Context, in *GroupPutinListReq, opts ...grpc.CallOption) (*GroupPutinListResp, error)
@@ -166,13 +163,10 @@ func (c *socialClient) GroupUsers(ctx context.Context, in *GroupUsersReq, opts .
 //
 // svc
 type SocialServer interface {
-	// 好友业务：请求好友、通过或拒绝申请、好友列表
 	FriendPutIn(context.Context, *FriendPutInReq) (*FriendPutInResp, error)
 	FriendPutInHandle(context.Context, *FriendPutInHandleReq) (*FriendPutInHandleResp, error)
 	FriendPutInList(context.Context, *FriendPutInListReq) (*FriendPutInListResp, error)
 	FriendList(context.Context, *FriendListReq) (*FriendListResp, error)
-	// 群业务：创建群，修改群，群公告，申请群，用户群列表，群成员，申请群，群退出..
-	// 群要求
 	GroupCreate(context.Context, *GroupCreateReq) (*GroupCreateResp, error)
 	GroupPutin(context.Context, *GroupPutinReq) (*GroupPutinResp, error)
 	GroupPutinList(context.Context, *GroupPutinListReq) (*GroupPutinListResp, error)

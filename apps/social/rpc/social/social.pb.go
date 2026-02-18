@@ -498,7 +498,6 @@ func (x *GroupRequests) GetHandleResult() int32 {
 	return 0
 }
 
-// req resp
 type FriendPutInReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=userId,proto3" json:"userId,omitempty"`
@@ -946,6 +945,7 @@ func (x *GroupCreateReq) GetCreatorUid() string {
 
 type GroupCreateResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -978,6 +978,13 @@ func (x *GroupCreateResp) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GroupCreateResp.ProtoReflect.Descriptor instead.
 func (*GroupCreateResp) Descriptor() ([]byte, []int) {
 	return file_apps_social_rpc_social_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GroupCreateResp) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 type GroupPutinReq struct {
@@ -1066,6 +1073,7 @@ func (x *GroupPutinReq) GetInviterUid() string {
 
 type GroupPutinResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       string                 `protobuf:"bytes,1,opt,name=groupId,proto3" json:"groupId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1098,6 +1106,13 @@ func (x *GroupPutinResp) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GroupPutinResp.ProtoReflect.Descriptor instead.
 func (*GroupPutinResp) Descriptor() ([]byte, []int) {
 	return file_apps_social_rpc_social_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GroupPutinResp) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
 }
 
 type GroupPutinListReq struct {
@@ -1274,6 +1289,7 @@ func (x *GroupPutInHandleReq) GetUserAvatarUrl() string {
 
 type GroupPutInHandleResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       string                 `protobuf:"bytes,1,opt,name=groupId,proto3" json:"groupId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1306,6 +1322,13 @@ func (x *GroupPutInHandleResp) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GroupPutInHandleResp.ProtoReflect.Descriptor instead.
 func (*GroupPutInHandleResp) Descriptor() ([]byte, []int) {
 	return file_apps_social_rpc_social_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GroupPutInHandleResp) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
 }
 
 type GroupListReq struct {
@@ -1442,7 +1465,7 @@ func (x *GroupUsersReq) GetGroupId() string {
 
 type GroupUsersResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*GroupMembers        `protobuf:"bytes,1,rep,name=List,proto3" json:"List,omitempty"`
+	List          []*GroupMembers        `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1565,8 +1588,9 @@ const file_apps_social_rpc_social_proto_rawDesc = "" +
 	"\x04icon\x18\x03 \x01(\tR\x04icon\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x1f\n" +
 	"\vcreator_uid\x18\x05 \x01(\tR\n" +
-	"creatorUid\"\x11\n" +
-	"\x0fGroupCreateResp\"\xb1\x01\n" +
+	"creatorUid\"!\n" +
+	"\x0fGroupCreateResp\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xb1\x01\n" +
 	"\rGroupPutinReq\x12\x18\n" +
 	"\agroupId\x18\x02 \x01(\tR\agroupId\x12\x14\n" +
 	"\x05reqId\x18\x03 \x01(\tR\x05reqId\x12\x16\n" +
@@ -1577,8 +1601,9 @@ const file_apps_social_rpc_social_proto_rawDesc = "" +
 	"joinSource\x12\x1e\n" +
 	"\n" +
 	"inviterUid\x18\a \x01(\tR\n" +
-	"inviterUid\"\x10\n" +
-	"\x0eGroupPutinResp\"-\n" +
+	"inviterUid\"*\n" +
+	"\x0eGroupPutinResp\x12\x18\n" +
+	"\agroupId\x18\x01 \x01(\tR\agroupId\"-\n" +
 	"\x11GroupPutinListReq\x12\x18\n" +
 	"\agroupId\x18\x01 \x01(\tR\agroupId\"?\n" +
 	"\x12GroupPutinListResp\x12)\n" +
@@ -1591,8 +1616,9 @@ const file_apps_social_rpc_social_proto_rawDesc = "" +
 	"\thandleUid\x18\x03 \x01(\tR\thandleUid\x12\"\n" +
 	"\fhandleResult\x18\x04 \x01(\x05R\fhandleResult\x12\x1a\n" +
 	"\busername\x18\x06 \x01(\tR\busername\x12$\n" +
-	"\ruserAvatarUrl\x18\a \x01(\tR\ruserAvatarUrl\"\x16\n" +
-	"\x14GroupPutInHandleResp\"&\n" +
+	"\ruserAvatarUrl\x18\a \x01(\tR\ruserAvatarUrl\"0\n" +
+	"\x14GroupPutInHandleResp\x12\x18\n" +
+	"\agroupId\x18\x01 \x01(\tR\agroupId\"&\n" +
 	"\fGroupListReq\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\"3\n" +
 	"\rGroupListResp\x12\"\n" +
@@ -1600,7 +1626,7 @@ const file_apps_social_rpc_social_proto_rawDesc = "" +
 	"\rGroupUsersReq\x12\x18\n" +
 	"\agroupId\x18\x01 \x01(\tR\agroupId\":\n" +
 	"\x0eGroupUsersResp\x12(\n" +
-	"\x04List\x18\x01 \x03(\v2\x14.social.GroupMembersR\x04List2\xaf\x05\n" +
+	"\x04list\x18\x01 \x03(\v2\x14.social.GroupMembersR\x04list2\xaf\x05\n" +
 	"\x06social\x12>\n" +
 	"\vFriendPutIn\x12\x16.social.FriendPutInReq\x1a\x17.social.FriendPutInResp\x12P\n" +
 	"\x11FriendPutInHandle\x12\x1c.social.FriendPutInHandleReq\x1a\x1d.social.FriendPutInHandleResp\x12J\n" +
@@ -1662,7 +1688,7 @@ var file_apps_social_rpc_social_proto_depIdxs = []int32{
 	0,  // 1: social.FriendListResp.list:type_name -> social.Friends
 	4,  // 2: social.GroupPutinListResp.list:type_name -> social.GroupRequests
 	2,  // 3: social.GroupListResp.list:type_name -> social.Groups
-	3,  // 4: social.GroupUsersResp.List:type_name -> social.GroupMembers
+	3,  // 4: social.GroupUsersResp.list:type_name -> social.GroupMembers
 	5,  // 5: social.social.FriendPutIn:input_type -> social.FriendPutInReq
 	7,  // 6: social.social.FriendPutInHandle:input_type -> social.FriendPutInHandleReq
 	9,  // 7: social.social.FriendPutInList:input_type -> social.FriendPutInListReq
