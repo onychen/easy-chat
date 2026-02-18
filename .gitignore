@@ -1,13 +1,3 @@
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -26,24 +16,35 @@ vendor/
 
 # Go workspace file
 go.work
+go.work.sum
 
-# Environment files
-.env
-.env.local
-.env.*.local
+# Database files and data - explicitly list each data dir
+components/mysql/data/
+components/etcd/data/
+components/redis/data/
 
-# Logs
-*.log
-logs/
-
-# Docker
-docker-compose.override.yml
-
-# Database data (MySQL, Redis, etc.)
-components/
-
-# Temporary files
-tmp/
-temp/
-*.tmp
+# Deployment archives
 *.tar
+*.tar.gz
+*.zip
+
+# Log files
+*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Socket files
+*.sock
+
+# Build outputs
+bin/
+dist/
