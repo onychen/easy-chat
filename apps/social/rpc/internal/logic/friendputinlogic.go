@@ -14,6 +14,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type FriendPutInLogic struct {
@@ -49,7 +50,33 @@ func (l *FriendPutInLogic) FriendPutIn(in *social.FriendPutInReq) (*social.Frien
 		return nil, errors.Wrapf(xerr.NewDBErr(), "find friendsRequest by rid and uid err %v req %v ", err, in)
 	}
 	if friendReqs != nil {
-		return &social.FriendPutInResp{}, err
+		if constants.HandlerResult(friendReqs.HandleResult.Int64) != constants.RefuseHandlerResult {
+			return &social.FriendPutInResp{}, err
+		}
+
+		friendReqs.ReqMsg = sql.NullString{
+			Valid:  true,
+			String: in.ReqMsg,
+		}
+		friendReqs.ReqTime = time.Unix(in.ReqTime, 0)
+		friendReqs.HandleResult = sql.NullInt64{
+			Int64: int64(constants.NoHandlerResult),
+			Valid: true,
+		}
+		friendReqs.HandleMsg = sql.NullString{}
+		friendReqs.HandledAt = sql.NullTime{}
+
+		err = l.svcCtx.FriendRequestsModel.Trans(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+			if err := l.svcCtx.FriendRequestsModel.Update(ctx, session, friendReqs); err != nil {
+				return errors.Wrapf(xerr.NewDBErr(), "update friendRequest err %v req %v ", err, friendReqs)
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		return &social.FriendPutInResp{}, nil
 	}
 
 	// 创建申请记录
