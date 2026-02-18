@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
 	"easy-chat/apps/social/rpc/internal/svc"
 	"easy-chat/apps/social/rpc/social"
@@ -59,32 +60,57 @@ func (l *GroupPutinLogic) GroupPutin(in *social.GroupPutinReq) (*social.GroupPut
 			in.GroupId, in.ReqId)
 	}
 	if groupReq != nil {
-		return &social.GroupPutinResp{}, nil
-	}
-
-	groupReq = &socialmodels.GroupRequests{
-		ReqId:   in.ReqId,
-		GroupId: in.GroupId,
-		ReqMsg: sql.NullString{
-			String: in.ReqMsg,
-			Valid:  true,
-		},
-		ReqTime: sql.NullTime{
-			Time:  time.Unix(in.ReqTime, 0),
-			Valid: true,
-		},
-		JoinSource: sql.NullInt64{
-			Int64: int64(in.JoinSource),
-			Valid: true,
-		},
-		InviterUserId: sql.NullString{
-			String: in.InviterUid,
-			Valid:  true,
-		},
-		HandleResult: sql.NullInt64{
-			Int64: int64(constants.NoHandlerResult),
-			Valid: true,
-		},
+		if constants.HandlerResult(groupReq.HandleResult.Int64) == constants.RefuseHandlerResult {
+			groupReq.HandleResult = sql.NullInt64{
+				Int64: int64(constants.NoHandlerResult),
+				Valid: true,
+			}
+			groupReq.ReqMsg = sql.NullString{
+				String: in.ReqMsg,
+				Valid:  true,
+			}
+			groupReq.ReqTime = sql.NullTime{
+				Time:  time.Unix(in.ReqTime, 0),
+				Valid: true,
+			}
+			groupReq.JoinSource = sql.NullInt64{
+				Int64: int64(in.JoinSource),
+				Valid: true,
+			}
+			groupReq.InviterUserId = sql.NullString{
+				String: in.InviterUid,
+				Valid:  true,
+			}
+			groupReq.HandleUserId = sql.NullString{}
+			groupReq.HandleTime = sql.NullTime{}
+		} else {
+			return &social.GroupPutinResp{}, nil
+		}
+	} else {
+		groupReq = &socialmodels.GroupRequests{
+			ReqId:   in.ReqId,
+			GroupId: in.GroupId,
+			ReqMsg: sql.NullString{
+				String: in.ReqMsg,
+				Valid:  true,
+			},
+			ReqTime: sql.NullTime{
+				Time:  time.Unix(in.ReqTime, 0),
+				Valid: true,
+			},
+			JoinSource: sql.NullInt64{
+				Int64: int64(in.JoinSource),
+				Valid: true,
+			},
+			InviterUserId: sql.NullString{
+				String: in.InviterUid,
+				Valid:  true,
+			},
+			HandleResult: sql.NullInt64{
+				Int64: int64(constants.NoHandlerResult),
+				Valid: true,
+			},
+		}
 	}
 
 	createGroupMember := func() {
@@ -145,9 +171,21 @@ func (l *GroupPutinLogic) GroupPutin(in *social.GroupPutinReq) (*social.GroupPut
 
 func (l *GroupPutinLogic) createGroupReq(groupReq *socialmodels.GroupRequests, isPass bool) (*social.GroupPutinResp, error) {
 
-	_, err := l.svcCtx.GroupRequestsModel.Insert(l.ctx, groupReq)
-	if err != nil {
-		return nil, errors.Wrapf(xerr.NewDBErr(), "insert group req err %v req %v", err, groupReq)
+	if groupReq.Id > 0 {
+		err := l.svcCtx.GroupRequestsModel.Trans(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+			if err := l.svcCtx.GroupRequestsModel.Update(ctx, session, groupReq); err != nil {
+				return errors.Wrapf(xerr.NewDBErr(), "update group req err %v req %v", err, groupReq)
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, err := l.svcCtx.GroupRequestsModel.Insert(l.ctx, groupReq)
+		if err != nil {
+			return nil, errors.Wrapf(xerr.NewDBErr(), "insert group req err %v req %v", err, groupReq)
+		}
 	}
 
 	if isPass {
