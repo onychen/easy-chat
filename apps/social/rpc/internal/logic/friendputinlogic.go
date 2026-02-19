@@ -8,7 +8,6 @@ import (
 	"easy-chat/apps/social/rpc/internal/svc"
 	"easy-chat/apps/social/rpc/social"
 	"easy-chat/apps/social/socialmodels"
-	"easy-chat/apps/user/rpc/userclient"
 	"easy-chat/pkg/xerr"
 
 	"easy-chat/pkg/constants"
@@ -38,16 +37,6 @@ func (l *FriendPutInLogic) FriendPutIn(in *social.FriendPutInReq) (*social.Frien
 
 	if in.UserId == in.ReqUid {
 		return nil, errors.WithStack(xerr.NewMsg("不能申请自己为好友"))
-	}
-
-	userResp, err := l.svcCtx.User.FindUser(l.ctx, &userclient.FindUserReq{
-		Ids: []string{in.ReqUid},
-	})
-	if err != nil {
-		return nil, errors.Wrapf(xerr.NewDBErr(), "find user by id err %v, req %v", err, in.ReqUid)
-	}
-	if len(userResp.User) == 0 {
-		return nil, errors.WithStack(xerr.NewMsg("用户不存在"))
 	}
 
 	// 申请人是否与目标是好友关系
