@@ -35,6 +35,10 @@ func NewFriendPutInLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Frien
 func (l *FriendPutInLogic) FriendPutIn(in *social.FriendPutInReq) (*social.FriendPutInResp, error) {
 	// todo: add your logic here and delete this line
 
+	if in.UserId == in.ReqUid {
+		return nil, errors.WithStack(xerr.NewMsg("不能申请自己为好友"))
+	}
+
 	// 申请人是否与目标是好友关系
 	friends, err := l.svcCtx.FriendsModel.FindByUidAndFid(l.ctx, in.UserId, in.ReqUid)
 	if err != nil && err != socialmodels.ErrNotFound {
