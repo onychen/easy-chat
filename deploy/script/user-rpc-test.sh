@@ -3,9 +3,6 @@
 reso_addr='crpi-osk929019sdokpya.cn-guangzhou.personal.cr.aliyuncs.com/easy-ct/user-rpc-dev'
 tag='latest'
 
-echo "登录阿里云镜像仓库..."
-docker login --username=onychen crpi-osk929019sdokpya.cn-guangzhou.personal.cr.aliyuncs.com
-
 pod_ip="192.168.88.130"
 
 container_name="easy-chat-user-rpc-test"
