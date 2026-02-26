@@ -7,6 +7,7 @@ import (
 	"easy-chat/apps/im/ws/websocket"
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/conf"
 )
@@ -27,6 +28,7 @@ func main() {
 
 	srv := websocket.NewServer(c.ListenOn,
 		websocket.WithServerAuthentication(handler.NewJwtAuth(ctx)),
+		websocket.WithServerMaxConnectionIdle(10*time.Minute),
 	)
 	defer srv.Stop()
 
