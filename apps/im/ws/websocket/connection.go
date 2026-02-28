@@ -14,6 +14,8 @@ type Conn struct {
 
 	s *Server
 
+	Uid string
+
 	idleMu            sync.Mutex // guard the following
 	idle              time.Time
 	maxConnectionIdle time.Duration
