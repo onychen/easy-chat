@@ -78,30 +78,35 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handlerConn(conn *Conn) {
 	// 记录连接
 	for {
-		// 读取请求信息
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
-			s.Errorf("websocket conn readMessage err %v, user Id %s", err, "")
 			// 关闭并删除连接
 			s.Close(conn)
 			return
 		}
 
-		// 解析请求信息
+		// 请求信息
 		var message Message
-		json.Unmarshal(msg, &message)
+		if err := json.Unmarshal(msg, &message); err != nil {
+			s.Send(NewErrMessage(err), conn)
+			continue
+		}
 
-		// 处理请求
+		// 依据请求消息类型分类处理
 		switch message.FrameType {
+		case FramePing:
+			// ping：回复
+			s.Send(&Message{FrameType: FramePing}, conn)
 		case FrameData:
+			// 处理
 			if handler, ok := s.routes[message.Method]; ok {
 				handler(s, conn, &message)
 			} else {
-				s.Send(&Message{FrameType: FrameData, Data: fmt.Sprintf("%v not found", message.Method)}, conn)
-				//conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("%v not found", message.Method)))
+				s.Send(&Message{
+					FrameType: FrameData,
+					Data:      fmt.Sprintf("%v not found", message.Method),
+				}, conn)
 			}
-		case FramePing:
-			s.Send(&Message{FrameType: FramePing}, conn)
 		}
 	}
 }
