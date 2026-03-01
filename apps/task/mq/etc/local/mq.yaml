@@ -1,0 +1,19 @@
+Name: task.mq
+ListenOn: 0.0.0.0:10091
+
+Mysql:
+  DataSource: root:easy-chat@tcp(192.168.100.1:13306)/easy-chat?charset=utf8mb4
+
+Cache:
+  - Host: 192.168.100.1:16379
+    Type: node
+    Pass: easy-chat
+
+MsgChatTransfer:
+  Name: msgChatTransfer
+  Brokers:
+    - 192.168.100.1:9092
+  Group: kafka
+  Topic: msgChatTransfer
+  Offset: first
+  Consumers: 1

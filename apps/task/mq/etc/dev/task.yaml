@@ -1,0 +1,7 @@
+Name: task.mq
+ListenOn: 0.0.0.0:10091
+
+  MsgChatTransfer:
+    Name: msg.chat.transfer
+    Broker: 
+      - 
