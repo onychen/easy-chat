@@ -13,7 +13,7 @@ type ServerOptions func(opt *serverOption)
 
 type serverOption struct {
 	Authentication
-	patten string
+	pattern string
 
 	maxConnectionIdle time.Duration
 }
@@ -21,7 +21,7 @@ type serverOption struct {
 func newServerOptions(opts ...ServerOptions) serverOption {
 	o := serverOption{
 		Authentication:    new(authentication),
-		patten:            "/ws",
+		pattern:           "/ws",
 		maxConnectionIdle: defaultMaxConnectionIdle,
 	}
 
@@ -37,9 +37,9 @@ func WithServerAuthentication(auth Authentication) ServerOptions {
 	}
 }
 
-func WithServerPatten(patten string) ServerOptions {
+func WithServerPatten(pattern string) ServerOptions {
 	return func(opt *serverOption) {
-		opt.patten = patten
+		opt.pattern = pattern
 	}
 }
 

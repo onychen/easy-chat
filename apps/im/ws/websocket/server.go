@@ -22,7 +22,7 @@ type Server struct {
 
 	connToUser map[*Conn]string
 	userToConn map[string]*Conn
-	patten     string
+	pattern    string
 
 	upgrader websocket.Upgrader
 	logx.Logger
@@ -33,7 +33,7 @@ func NewServer(addr string, opts ...ServerOptions) *Server {
 
 	return &Server{
 		addr:           addr,
-		patten:         opt.patten,
+		pattern:        opt.pattern,
 		opt:            &opt,
 		authentication: opt.Authentication,
 
@@ -75,6 +75,7 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 	go s.handlerConn(conn)
 }
 
+// handlerConn 处理连接
 func (s *Server) handlerConn(conn *Conn) {
 	// 记录连接
 	for {
@@ -91,6 +92,8 @@ func (s *Server) handlerConn(conn *Conn) {
 			s.Send(NewErrMessage(err), conn)
 			continue
 		}
+
+		//todo : 给客户端发送一个ack
 
 		// 依据请求消息类型分类处理
 		switch message.FrameType {
@@ -226,7 +229,7 @@ func (s *Server) AddRoutes(rs []Route) {
 }
 
 func (s *Server) Start() {
-	http.HandleFunc(s.patten, s.ServerWs)
+	http.HandleFunc(s.pattern, s.ServerWs)
 	http.ListenAndServe(s.addr, nil)
 }
 
