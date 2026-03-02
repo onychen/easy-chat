@@ -1,8 +1,3 @@
-/**
- * @author: dn-jinmin/dn-jinmin
- * @doc:
- */
-
 package websocket
 
 import (
@@ -16,6 +11,8 @@ type serverOption struct {
 	pattern string
 
 	maxConnectionIdle time.Duration
+	ack               AckType
+	ackTimeout        time.Duration
 }
 
 func newServerOptions(opts ...ServerOptions) serverOption {
@@ -23,6 +20,8 @@ func newServerOptions(opts ...ServerOptions) serverOption {
 		Authentication:    new(authentication),
 		pattern:           "/ws",
 		maxConnectionIdle: defaultMaxConnectionIdle,
+		ack:               NoAck,
+		ackTimeout:        defaultAckTimeout,
 	}
 
 	for _, opt := range opts {
@@ -37,7 +36,7 @@ func WithServerAuthentication(auth Authentication) ServerOptions {
 	}
 }
 
-func WithServerPatten(pattern string) ServerOptions {
+func WithServerPattern(pattern string) ServerOptions {
 	return func(opt *serverOption) {
 		opt.pattern = pattern
 	}
@@ -47,6 +46,20 @@ func WithServerMaxConnectionIdle(maxConnectionIdle time.Duration) ServerOptions 
 	return func(opt *serverOption) {
 		if maxConnectionIdle > 0 {
 			opt.maxConnectionIdle = maxConnectionIdle
+		}
+	}
+}
+
+func WithServerAck(ack AckType) ServerOptions {
+	return func(opt *serverOption) {
+		opt.ack = ack
+	}
+}
+
+func WithServerAckTimeout(ackTimeout time.Duration) ServerOptions {
+	return func(opt *serverOption) {
+		if ackTimeout > 0 {
+			opt.ackTimeout = ackTimeout
 		}
 	}
 }
