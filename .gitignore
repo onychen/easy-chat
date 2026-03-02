@@ -18,10 +18,8 @@ vendor/
 go.work
 go.work.sum
 
-# Database files and data - explicitly list each data dir
-components/mysql/data/
-components/etcd/data/
-components/redis/data/
+# Components (local services: mysql, redis, etcd, mongo)
+components/
 
 # Deployment archives
 *.tar

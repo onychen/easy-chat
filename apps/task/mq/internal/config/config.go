@@ -1,13 +1,16 @@
 package config
 
 import (
+	"github.com/zeromicro/go-queue/kq"
+	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
-	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type Config struct {
-	zrpc.RpcServerConf
+	service.ServiceConf
+
+	ListenOn string
 
 	Mysql struct {
 		DataSource string
@@ -15,10 +18,15 @@ type Config struct {
 
 	Cache cache.CacheConf
 
-	Redisx redis.RedisConf
+	MsgChatTransfer kq.KqConf
 
-	Jwt struct {
-		AccessSecret string
-		AccessExpire int64
+	Redisx redis.RedisConf
+	Mongo  struct {
+		Url string
+		Db  string
+	}
+
+	Ws struct {
+		Host string
 	}
 }
