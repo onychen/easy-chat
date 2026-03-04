@@ -7,12 +7,21 @@ SocialRpc:
     Hosts:
     - 192.168.100.1:3379
     Key: social.rpc
+  Timeout: 10000
 
 UserRpc:
   Etcd:
     Hosts:
     - 192.168.100.1:3379
     Key: user.rpc
-    
+  Timeout: 10000
+
+ImRpc:
+  Etcd:
+    Hosts:
+    - 192.168.100.1:3379
+    Key: im.rpc
+  Timeout: 10000
+
 JwtAuth:
   AccessSecret: onychen123

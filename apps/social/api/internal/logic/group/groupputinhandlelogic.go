@@ -1,10 +1,11 @@
-// Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
-
 package group
 
 import (
 	"context"
+	"easy-chat/apps/im/rpc/imclient"
+	"easy-chat/apps/social/rpc/socialclient"
+	"easy-chat/pkg/constants"
+	"easy-chat/pkg/ctxdata"
 
 	"easy-chat/apps/social/api/internal/svc"
 	"easy-chat/apps/social/api/internal/types"
@@ -18,7 +19,6 @@ type GroupPutInHandleLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-// 申请进群处理
 func NewGroupPutInHandleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GroupPutInHandleLogic {
 	return &GroupPutInHandleLogic{
 		Logger: logx.WithContext(ctx),
@@ -29,6 +29,29 @@ func NewGroupPutInHandleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 
 func (l *GroupPutInHandleLogic) GroupPutInHandle(req *types.GroupPutInHandleRep) (resp *types.GroupPutInHandleResp, err error) {
 	// todo: add your logic here and delete this line
+	uid := ctxdata.GetUId(l.ctx)
+	res, err := l.svcCtx.Social.GroupPutInHandle(l.ctx, &socialclient.GroupPutInHandleReq{
+		GroupReqId:   req.GroupReqId,
+		GroupId:      req.GroupId,
+		HandleUid:    uid,
+		HandleResult: req.HandleResult,
+	})
 
-	return
+	if constants.HandlerResult(req.HandleResult) != constants.PassHandlerResult {
+		return
+	}
+
+	// todo: 通过后的业务
+
+	if res.GroupId == "" {
+		return nil, err
+	}
+
+	_, err = l.svcCtx.Im.SetUpUserConversation(l.ctx, &imclient.SetUpUserConversationReq{
+		SendId:   uid,
+		RecvId:   res.GroupId,
+		ChatType: int32(constants.GroupChatType),
+	})
+
+	return nil, err
 }
