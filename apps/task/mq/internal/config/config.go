@@ -20,6 +20,7 @@ type Config struct {
 	Cache cache.CacheConf
 
 	MsgChatTransfer kq.KqConf
+	MsgReadTransfer kq.KqConf
 
 	Redisx redis.RedisConf
 	Mongo  struct {
