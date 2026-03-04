@@ -4,6 +4,7 @@ import (
 	"context"
 	imModels "easy-chat/apps/im/immodels"
 	"easy-chat/apps/im/ws/websocket"
+	"easy-chat/apps/social/rpc/socialclient"
 	"easy-chat/apps/task/mq/internal/svc"
 	"easy-chat/apps/task/mq/mq"
 	"easy-chat/pkg/constants"
@@ -38,13 +39,15 @@ func (m *MsgChatTransfer) Consume(ctx context.Context, key, value string) error 
 		return err
 	}
 
-	// 推送发送
-	return m.svc.WsClient.Send(websocket.Message{
-		FrameType: websocket.FrameData,
-		Method:    "push",
-		FormId:    constants.SYSTEM_ROOT_UID,
-		Data:      data,
-	})
+	// 具体推送
+
+	switch data.ChatType {
+	case constants.SingleChatType:
+		return m.single(ctx, &data)
+	case constants.GroupChatType:
+		return m.group(ctx, &data)
+	}
+	return nil
 }
 
 // 记录消息
@@ -53,11 +56,49 @@ func (m *MsgChatTransfer) addChatLog(ctx context.Context, data mq.MsgChatTransfe
 		ConversationId: data.ConversationId,
 		SendId:         data.SendId,
 		RecvId:         data.RecvId,
-		ChatType:       data.ChatType,
-		MsgFrom:        0,
 		MsgType:        data.MType,
 		MsgContent:     data.Content,
+		ChatType:       data.ChatType,
 		SendTime:       data.SendTime,
 	}
-	return m.svc.ChatLogModel.Insert(ctx, &chatLog)
+	err := m.svc.ChatLogModel.Insert(ctx, &chatLog)
+	if err != nil {
+		return err
+	}
+
+	return m.svc.ConversationModel.UpdateMsg(ctx, &chatLog)
+}
+
+func (m *MsgChatTransfer) single(ctx context.Context, data *mq.MsgChatTransfer) error {
+	return m.svc.WsClient.Send(websocket.Message{
+		FrameType: websocket.FrameData,
+		Method:    "push",
+		FormId:    constants.SYSTEM_ROOT_UID,
+		Data:      data,
+	})
+}
+
+func (m *MsgChatTransfer) group(ctx context.Context, data *mq.MsgChatTransfer) error {
+	res, err := m.svc.Social.GroupUsers(ctx, &socialclient.GroupUsersReq{
+		GroupId: data.RecvId,
+	})
+	if err != nil {
+		return err
+	}
+
+	data.RecvIds = make([]string, 0, len(res.List))
+	for _, member := range res.List {
+		// 跳过发送人
+		if member.UserId == data.SendId {
+			continue
+		}
+		data.RecvIds = append(data.RecvIds, member.UserId)
+	}
+
+	return m.svc.WsClient.Send(websocket.Message{
+		FrameType: websocket.FrameData,
+		Method:    "push",
+		FormId:    constants.SYSTEM_ROOT_UID,
+		Data:      data,
+	})
 }

@@ -3,11 +3,12 @@ package logic
 import (
 	"context"
 	"database/sql"
-	"github.com/pkg/errors"
-	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"easy-chat/apps/social/socialmodels"
 	"easy-chat/pkg/constants"
 	"easy-chat/pkg/xerr"
+
+	"github.com/pkg/errors"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
 	"easy-chat/apps/social/rpc/internal/svc"
 	"easy-chat/apps/social/rpc/social"
@@ -77,5 +78,11 @@ func (l *GroupPutInHandleLogic) GroupPutInHandle(in *social.GroupPutInHandleReq)
 		return nil
 	})
 
-	return &social.GroupPutInHandleResp{}, err
+	if constants.HandlerResult(groupReq.HandleResult.Int64) != constants.PassHandlerResult {
+		return &social.GroupPutInHandleResp{}, err
+	}
+
+	return &social.GroupPutInHandleResp{
+		GroupId: groupReq.GroupId,
+	}, err
 }
