@@ -46,6 +46,7 @@ services:
     networks:
       easy-chat:
     command: etcd --data-dir=/etcd-data --enable-v2=true
+    restart: always
 
   redis:
     image: redis:alpine3.18

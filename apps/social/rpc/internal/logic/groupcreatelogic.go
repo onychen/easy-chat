@@ -6,6 +6,7 @@ import (
 	"easy-chat/pkg/constants"
 	"easy-chat/pkg/wuid"
 	"easy-chat/pkg/xerr"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -30,7 +31,7 @@ func NewGroupCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Group
 	}
 }
 
-// 群业务：创建群，修改群，群公告，申请群，用户群列表，群成员，申请群，群退出..
+// 群要求
 func (l *GroupCreateLogic) GroupCreate(in *social.GroupCreateReq) (*social.GroupCreateResp, error) {
 	// todo: add your logic here and delete this line
 
@@ -61,5 +62,9 @@ func (l *GroupCreateLogic) GroupCreate(in *social.GroupCreateReq) (*social.Group
 		return nil
 	})
 
-	return &social.GroupCreateResp{}, err
+	time.Sleep(2 * time.Second)
+
+	return &social.GroupCreateResp{
+		Id: groups.Id,
+	}, err
 }

@@ -68,7 +68,8 @@ func NewServer(addr string, opts ...ServerOptions) *Server {
 		connToUser: make(map[*Conn]string),
 		userToConn: make(map[string]*Conn),
 
-		Logger: logx.WithContext(context.Background()),
+		Logger:     logx.WithContext(context.Background()),
+		TaskRunner: threading.NewTaskRunner(opt.concurrency),
 	}
 }
 
@@ -91,7 +92,7 @@ func (s *Server) ServerWs(w http.ResponseWriter, r *http.Request) {
 
 	if !s.authentication.Auth(w, r) {
 		//conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprint("不具备访问权限")))
-		s.Send(&Message{FrameType: FrameData, Data: fmt.Sprint("不具备访问权限")}, conn)
+		s.Send(&Message{FrameType: FrameData, Data: "Auth Failed"}, conn)
 		conn.Close()
 		return
 	}
@@ -137,6 +138,7 @@ func (s *Server) handlerConn(conn *Conn) {
 			s.Infof("conn message read ack msg %v", message)
 			conn.appendMsgMq(&message)
 		} else {
+			s.Infof("recv msg: %+v", message)
 			conn.message <- &message
 		}
 	}
@@ -247,16 +249,25 @@ func (s *Server) handlerWrite(conn *Conn) {
 			// 连接关闭
 			return
 		case message := <-conn.message:
+			s.Infof("handlerWrite 收到消息: %+v", message)
 			switch message.FrameType {
 			case FramePing:
 				s.Send(&Message{FrameType: FramePing}, conn)
 			case FrameData:
+				s.Infof("处理 FrameData, method: %v, conn.Uid: %v", message.Method, conn.Uid)
 				// 根据请求的method分发路由并执行
 				if handler, ok := s.routes[message.Method]; ok {
 					handler(s, conn, message)
 				} else {
 					s.Send(&Message{FrameType: FrameData, Data: fmt.Sprintf("不存在执行的方法 %v 请检查", message.Method)}, conn)
-					//conn.WriteMessage(&Message{}, []byte(fmt.Sprintf("不存在执行的方法 %v 请检查", message.Method)))
+				}
+			case FrameAck:
+				s.Infof("处理 FrameAck(push), method: %v, conn.Uid: %v", message.Method, conn.Uid)
+				// 根据请求的method分发路由并执行
+				if handler, ok := s.routes[message.Method]; ok {
+					handler(s, conn, message)
+				} else {
+					s.Errorf("不存在执行的方法 %v 请检查", message.Method)
 				}
 			}
 
@@ -271,6 +282,7 @@ func (s *Server) handlerWrite(conn *Conn) {
 
 func (s *Server) addConn(conn *Conn, req *http.Request) {
 	uid := s.authentication.UserId(req)
+	s.Infof("新连接加入, uid: %v", uid)
 
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
@@ -289,7 +301,7 @@ func (s *Server) GetConn(uid string) *Conn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 
-	fmt.Println(s.userToConn)
+	s.Infof("查找连接, uid: %v, 在线用户: %v", uid, s.userToConn)
 	return s.userToConn[uid]
 }
 
