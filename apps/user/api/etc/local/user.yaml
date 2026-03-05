@@ -2,6 +2,10 @@ Name: user
 Host: 0.0.0.0
 Port: 8888
 
+Redisx:
+  Host: 192.168.100.1:16379
+  Pass: easy-chat
+
 UserRpc:
   Etcd:
     Hosts:

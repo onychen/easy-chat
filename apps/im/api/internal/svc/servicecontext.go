@@ -1,10 +1,10 @@
 package svc
 
 import (
+	"easy-chat/apps/im/api/internal/config"
 	"easy-chat/apps/im/rpc/imclient"
 	"easy-chat/apps/social/rpc/socialclient"
 	"easy-chat/apps/user/rpc/userclient"
-	"easy-chat/apps/im/api/internal/config"
 
 	"github.com/zeromicro/go-zero/zrpc"
 )
