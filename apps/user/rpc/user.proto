@@ -14,7 +14,7 @@ message UserEntity {
   int32   sex = 6;
 }
 
-// req 与 respo
+// req 与 resp
 message Request {
   string ping = 1;
 }
@@ -29,6 +29,7 @@ message LoginReq {
 }
 
 message LoginResp {
+  string id = 3;
   string Token = 1;
   int64 expire = 2;
 }
@@ -66,8 +67,12 @@ message FindUserResp {
 
 service User {
   rpc Ping(Request) returns (Response);
+
   rpc Login(LoginReq) returns (LoginResp);
+
   rpc Register(RegisterReq) returns (RegisterResp);
+
   rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
+
   rpc FindUser(FindUserReq) returns (FindUserResp);
 }

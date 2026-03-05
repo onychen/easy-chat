@@ -6,6 +6,7 @@ import (
 	"easy-chat/pkg/constants"
 	"easy-chat/pkg/wuid"
 	"easy-chat/pkg/xerr"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -60,6 +61,8 @@ func (l *GroupCreateLogic) GroupCreate(in *social.GroupCreateReq) (*social.Group
 		}
 		return nil
 	})
+
+	time.Sleep(2 * time.Second)
 
 	return &social.GroupCreateResp{
 		Id: groups.Id,

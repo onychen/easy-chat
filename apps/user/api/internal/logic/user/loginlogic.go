@@ -1,16 +1,16 @@
-// Code scaffolded by goctl. Safe to edit.
-// goctl 1.9.2
-
 package user
 
 import (
 	"context"
+	"easy-chat/apps/user/rpc/user"
+	"easy-chat/pkg/constants"
+	"fmt"
+
+	"github.com/jinzhu/copier"
 
 	"easy-chat/apps/user/api/internal/svc"
 	"easy-chat/apps/user/api/internal/types"
-	"easy-chat/apps/user/rpc/user"
 
-	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -20,7 +20,6 @@ type LoginLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-// 用户登入
 func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic {
 	return &LoginLogic{
 		Logger: logx.WithContext(ctx),
@@ -30,6 +29,10 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
+	// todo: add your logic here and delete this line
+
+	fmt.Println(l.svcCtx.Config.Database)
+
 	loginResp, err := l.svcCtx.User.Login(l.ctx, &user.LoginReq{
 		Phone:    req.Phone,
 		Password: req.Password,
@@ -40,6 +43,9 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 
 	var res types.LoginResp
 	copier.Copy(&res, loginResp)
+
+	// 处理登入的业务
+	l.svcCtx.Redis.HsetCtx(l.ctx, constants.REDIS_ONLINE_USER, loginResp.Id, "1")
 
 	return &res, nil
 }

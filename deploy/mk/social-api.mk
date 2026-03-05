@@ -9,7 +9,7 @@ DOCKER_REPO_TEST=crpi-osk929019sdokpya.cn-guangzhou.personal.cr.aliyuncs.com/eas
 # 测试版本
 VERSION_TEST=$(VERSION)
 # 编译的程序名称
-APP_NAME_TEST=easy-im-${SERVER_NAME}-${SERVER_TYPE}-test
+APP_NAME_TEST=easy-im-${SERVER_NAME}-${SERVER_TYPE}-dev
 
 # 测试下的编译文件
 DOCKER_FILE_TEST=./deploy/dockerfile/Dockerfile_${SERVER_NAME}_${SERVER_TYPE}_dev
