@@ -3,25 +3,63 @@ package main
 import (
 	"flag"
 	"fmt"
+	"sync"
 
 	"easy-chat/apps/im/api/internal/config"
 	"easy-chat/apps/im/api/internal/handler"
 	"easy-chat/apps/im/api/internal/svc"
+	"easy-chat/pkg/configserver"
 	"easy-chat/pkg/resultx"
 
-	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/proc"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 var configFile = flag.String("f", "etc/local/im.yaml", "the config file")
 
+var wg sync.WaitGroup
+
 func main() {
 	flag.Parse()
 
 	var c config.Config
-	conf.MustLoad(*configFile, &c)
+	err := configserver.NewConfigServer(*configFile, configserver.NewSail(&configserver.Config{
+		ETCDEndpoints:  "192.168.100.1:3379",
+		ProjectKey:     "98c6f2c2287f4c73cea3d40ae7ec3ff2",
+		Namespace:      "im",
+		Configs:        "im-api.yaml",
+		ConfigFilePath: "./conf",
+		LogLevel:       "DEBUG",
+	})).MustLoad(&c, func(bytes []byte) error {
+		var c config.Config
+		configserver.LoadFromJsonBytes(bytes, &c)
 
+		proc.WrapUp()
+
+		wg.Add(1)
+		go func(c config.Config) {
+			defer wg.Done()
+
+			Run(c)
+		}(c)
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	wg.Add(1)
+	go func(c config.Config) {
+		defer wg.Done()
+
+		Run(c)
+	}(c)
+
+	wg.Wait()
+}
+
+func Run(c config.Config) {
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 

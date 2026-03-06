@@ -1,0 +1,26 @@
+host: 0.0.0.0
+imrpc:
+    etcd:
+        hosts:
+            - 192.168.100.1:3379
+        key: im.rpc
+    timeout: 10000
+jwtauth:
+    accesssecret: onychen123
+name: social
+port: 8881
+redisx:
+    host: 192.168.100.1:16379
+    pass: easy-chat
+socialrpc:
+    etcd:
+        hosts:
+            - 192.168.100.1:3379
+        key: social.rpc
+    timeout: 10000
+userrpc:
+    etcd:
+        hosts:
+            - 192.168.100.1:3379
+        key: user.rpc
+    timeout: 10000

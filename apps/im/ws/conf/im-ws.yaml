@@ -1,0 +1,15 @@
+jwtauth:
+    accesssecret: onychen123
+listenon: 0.0.0.0:10090
+mongo:
+    db: easy-chat
+    url: mongodb://root:easy-chat@192.168.100.1:27017
+msgchattransfer:
+    addrs:
+        - 192.168.100.1:9092
+    topic: msgChatTransfer
+msgreadtransfer:
+    addrs:
+        - 192.168.100.1:9092
+    topic: msgReadTransfer
+name: im.ws
