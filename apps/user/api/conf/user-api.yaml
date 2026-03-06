@@ -1,0 +1,15 @@
+database: mysqtest3
+host: 0.0.0.0
+jwtauth:
+    accessexpire: 8640000
+    accesssecret: onychen123
+name: user
+port: 8888
+redisx:
+    host: 192.168.100.1:16379
+    pass: easy-chat
+userrpc:
+    etcd:
+        hosts:
+            - 192.168.100.1:3379
+        key: user.rpc

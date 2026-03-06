@@ -4,6 +4,7 @@ import (
 	"context"
 	"easy-chat/apps/user/rpc/user"
 	"easy-chat/pkg/constants"
+	"fmt"
 
 	"github.com/jinzhu/copier"
 
@@ -29,6 +30,8 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
 	// todo: add your logic here and delete this line
+
+	fmt.Println(l.svcCtx.Config.Database)
 
 	loginResp, err := l.svcCtx.User.Login(l.ctx, &user.LoginReq{
 		Phone:    req.Phone,
