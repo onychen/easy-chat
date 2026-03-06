@@ -1,0 +1,42 @@
+cache:
+    - host: 192.168.100.1:16379
+      pass: easy-chat
+      type: node
+listenon: 0.0.0.0:10091
+mongo:
+    db: easy-chat
+    url: mongodb://root:easy-chat@192.168.100.1:27017
+msgchattransfer:
+    brokers:
+        - 192.168.100.1:9092
+    consumers: 1
+    group: kafka
+    name: msgChatTransfer
+    offset: first
+    topic: msgChatTransfer
+msgreadhandler:
+    groupmsgreadhandler: 1
+    groupmsgreadrecorddelaycount: 2
+    groupmsgreadrecorddelaytime: 60
+msgreadtransfer:
+    brokers:
+        - 192.168.100.1:9092
+    consumers: 1
+    group: kafka
+    name: MsgReadTransfer
+    offset: first
+    topic: msgReadTransfer
+mysql:
+    datasource: root:easy-chat@tcp(192.168.100.1:13306)/easy-chat?charset=utf8mb4
+name: task.mq
+redisx:
+    host: 192.168.100.1:16379
+    pass: easy-chat
+    type: node
+socialrpc:
+    etcd:
+        hosts:
+            - 192.168.100.1:3379
+        key: social.rpc
+ws:
+    host: 192.168.100.1:10090
