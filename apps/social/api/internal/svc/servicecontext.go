@@ -7,7 +7,12 @@ import (
 	"easy-chat/apps/social/rpc/socialclient"
 	"easy-chat/apps/user/rpc/userclient"
 	"easy-chat/pkg/interceptor"
+	"easy-chat/pkg/interceptor/rpcclient"
+	limitmiddleware "easy-chat/pkg/middleware"
 
+	"time"
+
+	"github.com/zeromicro/go-zero/core/load"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -33,6 +38,7 @@ var retryPolicy = `{
 type ServiceContext struct {
 	Config                config.Config
 	IdempotenceMiddleware rest.Middleware
+	LimitMiddleware       rest.Middleware
 	*redis.Redis
 	socialclient.Social
 	userclient.User
@@ -44,11 +50,19 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config:                c,
 		Redis:                 redis.MustNewRedis(c.Redisx),
 		IdempotenceMiddleware: middleware.NewIdempotenceMiddleware().Handler,
+		LimitMiddleware:       limitmiddleware.NewLimitMiddleware(c.Redisx).TokenLimitHandler(1, 100),
 		Social: socialclient.NewSocial(zrpc.MustNewClient(c.SocialRpc,
 			zrpc.WithDialOption(grpc.WithDefaultServiceConfig(retryPolicy)),
 			zrpc.WithUnaryClientInterceptor(interceptor.DefaultIdempotentClient),
 		)),
-		User: userclient.NewUser(zrpc.MustNewClient(c.UserRpc)),
-		Im:   imclient.NewIm(zrpc.MustNewClient(c.ImRpc)),
+
+		User: userclient.NewUser(zrpc.MustNewClient(c.UserRpc,
+			zrpc.WithUnaryClientInterceptor(rpcclient.NewSheddingClient("user-rpc",
+				load.WithBuckets(10),
+				load.WithCpuThreshold(1),
+				load.WithWindow(time.Millisecond*100000),
+			)),
+		)),
+		Im: imclient.NewIm(zrpc.MustNewClient(c.ImRpc)),
 	}
 }
